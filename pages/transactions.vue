@@ -40,7 +40,7 @@ export default {
   async mounted() {
 
     if (!this.$store.state.user) {
-      this.$router.push("/fake-signin");
+      this.$router.push("mock-login");
     } else {  
       this.user = this.$store.state.user;
       await this.getItem();

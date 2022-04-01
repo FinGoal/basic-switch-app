@@ -1,7 +1,7 @@
 <template>
   <div>
-    <div class="plaid-link-wrapper">
-    </div>
+    <!-- <div class="plaid-link-wrapper">
+    </div> -->
     <v-btn class="link-opener" @click="openLink">Link An Account</v-btn>
   </div>
 </template>
@@ -15,7 +15,7 @@ export default {
   //   }
   // },
   async mounted() {
-    const token = await this.generateToken();
+    // const token = await this.generateToken();
     // this.handler = this.createPlaidInstance(token);
   },
   methods: {
@@ -24,7 +24,7 @@ export default {
       try {
         const user = this.$store.state.user;
         if (!user) {
-          this.$router.push("/fake-signin");
+          this.$router.push("/mock-login");
         } else {
           const { username } = user;
 
@@ -77,8 +77,8 @@ export default {
     async openLink() {
       const access_token = await this.generateToken();
       const redirectUri = `http://localhost:3000/success`; // this is our current PORT
-      const linkMoneyGatewayBaseUrl = `https://linkmoney-gateway.fingoal.com`;
-      window.open(`${linkMoneyGatewayBaseUrl}/api/authenticate?token=${access_token}&redirectUri=${redirectUri}`);
+      const linkMoneyGatewayBaseUrl = `https://linkmoney-gateway.fingoal.com`; // This is the Link Money Gateway in Production. 
+      window.open(`${linkMoneyGatewayBaseUrl}/api/authenticate?token=${access_token}&redirectUri=${redirectUri}`); // Open the window with the Link Money Gateway, instead of opening the Plaid Link.
     }
   }
 }
