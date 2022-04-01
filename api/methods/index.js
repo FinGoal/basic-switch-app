@@ -1,3 +1,5 @@
+import axios from "axios";
+
 const { Configuration, PlaidApi, PlaidEnvironments, Products, CountryCode } = require("plaid");
 const moment = require("moment");
 const client = createPlaidClient();
@@ -24,31 +26,59 @@ function createPlaidClient() {
 }
 
 // creates a Plaid link token using a user-specific access token. This runs when we need a token to authenticate the frontend Plaid Link.
-export const createLinkToken = async (req, res, next) => {
-  const { headers } = req;
-  const { userid: userId } = headers;
+// REMOVED PLAID LINK TOKEN 
+// export const createLinkToken = async (req, res, next) => {
+//   const { headers } = req;
+//   const { userid: userId } = headers;
+//   if (!userId) {
+//     res.status(400).send({ 
+//       message: "MISSING_REQUIRED_HEADER",
+//       missingHeaders: ["userid"]
+//     });
+//   } else {
+//     const request = {
+//       user: {
+//         client_user_id: userId,
+//       },
+//       client_name: "PlaidLinkDev",
+//       products: [Products.Auth, Products.Transactions],
+//       language: "en",
+//       country_codes: [CountryCode.Us]
+//     }
+
+//     try {
+//       const createTokenResponse = await client.linkTokenCreate(request);
+//       res.status(200).send(createTokenResponse.data);
+//     } catch (error) {
+//       res.status(500).send({ error });
+//     }
+//   }
+// }
+
+export const getUserToken = async (req, res, next) => {
+
+  const { body } = req;
+  const { userId } = body; 
+
   if (!userId) {
-    res.status(400).send({ 
-      message: "MISSING_REQUIRED_HEADER",
-      missingHeaders: ["userid"]
-    });
+    res.status(400).send({ error: `userId field is required.` });
   } else {
-    const request = {
-      user: {
-        client_user_id: userId,
-      },
-      client_name: "PlaidLinkDev",
-      products: [Products.Auth, Products.Transactions],
-      language: "en",
-      country_codes: [CountryCode.Us]
+    const data = {
+      client_id: process.env.LINK_MONEY_CLIENT_ID, // Issued from the Link Money API Developer Portal
+      client_secret: process.env.LINK_MONEY_CLIENT_SECRET, // Issued from the Link Money API Developer Portal
+      audience: "https://link-money-api/",
+      grant_type: "client_credentials",
+      organization: "switchkit", // a test organization name for this demo. Do not alter this - doing so will interfere with your token's permissions and ability to load the proper Yodlee Fastlink OB configuration.
+      user_id: userId
     }
 
-    try {
-      const createTokenResponse = await client.linkTokenCreate(request);
-      res.status(200).send(createTokenResponse.data);
-    } catch (error) {
+    try { 
+      const response = await axios.post(process.env.LINK_MONEY_AUTHENTICATION_URL, data);
+      const { data: tokenData } = response;
+      res.status(200).send(tokenData);
+    } catch(error) {
       res.status(500).send({ error });
-    }
+    } 
   }
 }
 

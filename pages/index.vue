@@ -9,14 +9,14 @@
 <script>
 import axios from 'axios';
 export default {
-  data() {
-    return {
-      handler: null,
-    }
-  },
+  // data() {
+  //   return {
+  //     handler: null,
+  //   }
+  // },
   async mounted() {
     const token = await this.generateToken();
-    this.handler = this.createPlaidInstance(token);
+    // this.handler = this.createPlaidInstance(token);
   },
   methods: {
     // Checks if there is a valid username, and generates a Link token if so.
@@ -27,46 +27,58 @@ export default {
           this.$router.push("/fake-signin");
         } else {
           const { username } = user;
-          const response = await axios.post('/api/create-link-token', {}, { headers: { "userId": username }});
+
+          // PLAID LINK code removed 
+          // const response = await axios.post('/api/create-link-token', {}, { headers: { "userId": username }});
+          // const { data } = response;
+          // const { link_token } = data;
+          // return link_token;
+
+          // Link Money API Token Call
+          const response = await axios.post("/api/user-token", { userId: username });
           const { data } = response;
-          const { link_token } = data;
-          return link_token;
+          const { access_token } = data;
+          return access_token;
         }
       } catch (error) {
         console.log(error);
       }
     },
+    // PLAID LINK code removed.
     // Creates an instance of Plaid Link, using a valid link token.
-    createPlaidInstance(link_token) {
+    // createPlaidInstance(link_token) {
       
-      const vm = this; // need to bind this to a variable, otherwise it rebinds to Plaid.create
+    //   const vm = this; // need to bind this to a variable, otherwise it rebinds to Plaid.create
 
-      const handler = Plaid.create({
-        token: link_token,
-        onLoad() {
-          console.log("Plaid link loaded.");
-        },
-        onSuccess(public_token, metadata) {
-          console.log("Plaid link succeeded.");
-          vm.$store.commit("setPlaidMeta", metadata);
-          vm.$router.push("/success");
-        },
-        onExit(err, metadata) {
-          console.log("Plaid link exited.");
-          if (err) {
-            console.log(err);
-          }
-          vm.$store.commit("setPlaidMeta", metadata);
-        },
-        onEvent(eventName, metadata) {
-          vm.$store.commit("setPlaidMeta", metadata);
-        }
-      });
+    //   const handler = Plaid.create({
+    //     token: link_token,
+    //     onLoad() {
+    //       console.log("Plaid link loaded.");
+    //     },
+    //     onSuccess(public_token, metadata) {
+    //       console.log("Plaid link succeeded.");
+    //       vm.$store.commit("setPlaidMeta", metadata);
+    //       vm.$router.push("/success");
+    //     },
+    //     onExit(err, metadata) {
+    //       console.log("Plaid link exited.");
+    //       if (err) {
+    //         console.log(err);
+    //       }
+    //       vm.$store.commit("setPlaidMeta", metadata);
+    //     },
+    //     onEvent(eventName, metadata) {
+    //       vm.$store.commit("setPlaidMeta", metadata);
+    //     }
+    //   });
 
-      return handler;
-    },
-    openLink() {
-      this.handler.open();
+    //   return handler;
+    // },
+    async openLink() {
+      const access_token = await this.generateToken();
+      const redirectUri = `http://localhost:3000/success`; // this is our current PORT
+      const linkMoneyGatewayBaseUrl = `https://linkmoney-gateway.fingoal.com`;
+      window.open(`${linkMoneyGatewayBaseUrl}/api/authenticate?token=${access_token}&redirectUri=${redirectUri}`);
     }
   }
 }
