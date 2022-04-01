@@ -1,5 +1,5 @@
 <template>
-  <v-card v-if="plaidMeta">
+  <v-card>
     <v-card-title>Plaid Link</v-card-title>
     <v-divider></v-divider>
     <v-card-text>
@@ -15,7 +15,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="account in plaidMeta.accounts" :key="account.id">
+            <tr v-for="account in accounts" :key="account.id">
               <td>{{ account.id }}</td>
               <td>{{ account.mask }}</td>
               <td>{{ account.name }}</td>
@@ -41,14 +41,16 @@ export default {
   data() {
     return {
       user: null, 
-      plaidMeta: null,
+      accounts: [],
+      items: [],
     }
   },
   mounted() {
-    // only mount this page if the store contains both a user, and Plaid metadata.
-    if (this.$store.state.user && this.$store.state.plaidMeta) {
+    // only mount this page if the store contains a user
+    if (this.$store.state.user) {
       this.user = this.$store.state.user;
-      this.plaidMeta = this.$store.state.plaidMeta;
+
+      this.parseAccountsRedirectData();
     } else {
       // if the user or Plaid meta doesn't exist, push us back to the mock login.
       this.$router.push('/mock-login')
@@ -58,6 +60,16 @@ export default {
     // on pushing the next button, redirect to the transaction feed page.
     goToSummary() {
       this.$router.push("/transactions");
+    },
+    parseAccountsRedirectData() { 
+      const events = this.$route.query.events;
+      const eventsJson = JSON.parse(events);
+
+      eventsJson.forEach((event) => {
+        const { item_id, accounts } = event;
+        this.items.push(item_id);
+        this.accounts.push(...accounts);
+      });
     }
   }
 }
