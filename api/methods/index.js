@@ -25,36 +25,6 @@ function createPlaidClient() {
   }
 }
 
-// creates a Plaid link token using a user-specific access token. This runs when we need a token to authenticate the frontend Plaid Link.
-// REMOVED PLAID LINK TOKEN 
-// export const createLinkToken = async (req, res, next) => {
-//   const { headers } = req;
-//   const { userid: userId } = headers;
-//   if (!userId) {
-//     res.status(400).send({ 
-//       message: "MISSING_REQUIRED_HEADER",
-//       missingHeaders: ["userid"]
-//     });
-//   } else {
-//     const request = {
-//       user: {
-//         client_user_id: userId,
-//       },
-//       client_name: "PlaidLinkDev",
-//       products: [Products.Auth, Products.Transactions],
-//       language: "en",
-//       country_codes: [CountryCode.Us]
-//     }
-
-//     try {
-//       const createTokenResponse = await client.linkTokenCreate(request);
-//       res.status(200).send(createTokenResponse.data);
-//     } catch (error) {
-//       res.status(500).send({ error });
-//     }
-//   }
-// }
-
 export const getUserToken = async (req, res, next) => {
 
   const { body } = req;

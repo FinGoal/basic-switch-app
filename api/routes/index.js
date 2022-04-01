@@ -10,7 +10,6 @@ import {
 
 const router = express.Router();
 
-// router.post('/create-link-token', createLinkToken);
 router.post("/user-token", getUserToken);
 router.post('/exchange-public-token', exchangeForPublicToken);
 router.post('/accounts', getAccounts);
