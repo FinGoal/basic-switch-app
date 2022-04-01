@@ -1,4 +1,10 @@
 # Basic Plaid Application
+This repository contains a web application meant to demonstrate the basics of Plaid client-side code. Using the application, you can: 
+1. Link a financial account to Plaid 
+2. View the accounts you linked 
+3. View transactions associated with those accounts. 
+
+FinGoal uses this repository as a good starting point for the Switch Kit. By replacing this repository's Plaid dependency using the [Link Money Quickstart Documentation](https://www.notion.so/fingoal/Quickstart-Guide-bf1cf060267a43bbbde0f29f16b26bb9), you can move a functional production Plaid application over to Link Money in a matter of minutes. 
 
 ## Build Setup
 
@@ -15,6 +21,20 @@ $ npm run start
 
 # generate static project
 $ npm run generate
+```
+
+### Required Environment Variables
+```.env
+PLAID_CLIENT_ID=""
+PLAID_SECRET=""
+PLAID_REDIRECT_URI="http://localhost:3000" # unless deployed to a port other than default
+PLAID_ACCESS_TOKEN=""
+
+LINK_MONEY_API_BASE_URL="https://linkmoney.fingoal.com"
+LINK_MONEY_GATEWAY_BASE_URL="https://linkmoney-gateway.fingoal.com"
+LINK_MONEY_CLIENT_ID=""
+LINK_MONEY_CLIENT_SECRET=""
+LINK_MONEY_AUTHENTICATION_URL="https://dev-jhhgu9vc.auth0.com/oauth/token"
 ```
 
 ## Plaid Setup
