@@ -12,7 +12,7 @@
         </thead>
         <tbody>
           <tr v-for="transaction in transactions" :key="transaction.id">
-            <td>${{ transaction.amount }}</td>
+            <td>${{ transaction.amount.toFixed(2) }}</td>
             <td>{{ transaction.name }}</td>
             <td>{{ transaction.date }}</td>
             <td>{{ transaction.category.join(", ") }}</td>
@@ -29,59 +29,44 @@ export default {
   data() {
     return {
       error: null,
-      itemId: null,
+      itemIds: null,
       accessToken: null,
-      accounts: null,
-      transactions: null,
-      item: null,
+      accounts: [],
+      transactions: [],
       user: null,
     }
   },
   async mounted() {
-
-    if (!this.$store.state.user) {
+    if (!this.$store.state.user || !this.$store.state.itemArray) {
       this.$router.push("mock-login");
     } else {  
       this.user = this.$store.state.user;
-      await this.getItem();
-      await this.getAccounts();
+      this.itemIds = this.$store.state.itemArray;
       await this.getTransactions();
     }
   },
   methods: {
-    async getItem() {
-      const { public_token } = this.$store.state.plaidMeta;
-      if (!public_token) {
-        this.error = "No valid Plaid meta detected. Sorry!"
-      } else {
-        try {
-          const exchangeResponse = await axios.post("/api/exchange-public-token", { public_token });
-          const { data } = exchangeResponse;
-          const { item_id, access_token } = data;
-          this.itemId = item_id;
-          this.accessToken = access_token;
-        } catch(error) {
-          this.error = error.message;
-        }
-      }
-    },
-    // Example of how one could retrieve accounts from the PlaidApi client, rather than pulling them directly from the callback data.
-    async getAccounts() {
-      try {
-        const accountsResponse = await axios.post("/api/accounts", { access_token: this.accessToken });
-        const { data } = accountsResponse;
-        this.accounts = data.accounts;        
-        this.item = data.item;
-      } catch (error) {
-        console.error(error);
-      }
-    },
     // Transactions, unlike accounts, must be manually retrieved from the PlaidApi client. They do not appear in the Plaid callback data, because they are not always immediately available after account linking.
+    async generateAccessToken(itemId) {
+      try {   
+        const response = await axios.post("/api/item-token", { itemId });
+        const { data } = response;
+        const { access_token } = data;
+        return access_token;
+      } catch(error) {
+        console.log(error);
+      }
+    },
     async getTransactions() {
       try {
-        const transactionsResponse = await axios.post("/api/transactions", { access_token: this.accessToken });
-        const { data } = transactionsResponse;
-        this.transactions = data.transactions;        
+        for (let i = 0; i < this.itemIds.length; i++) {
+          const itemId = this.itemIds[i];
+          const token = await this.generateAccessToken(itemId);
+          const transactionsResponse = await axios.post("/api/transactions", { accessToken: token });
+          const { data } = transactionsResponse;
+          this.transactions.push(...data.transactions); 
+          this.accounts.push(...data.accounts); 
+        }
       } catch (error) {
         console.error(error);
       }

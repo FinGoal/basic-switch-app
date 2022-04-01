@@ -1,8 +1,7 @@
 import express from 'express';
 import {
   getUserToken,
-  getAccounts,
-  exchangeForPublicToken,
+  getItemToken,
   getTransactions,
 } from '../methods';
 
@@ -11,8 +10,7 @@ import {
 const router = express.Router();
 
 router.post("/user-token", getUserToken);
-router.post('/exchange-public-token', exchangeForPublicToken);
-router.post('/accounts', getAccounts);
+router.post("/item-token", getItemToken);
 router.post("/transactions", getTransactions);
 
 module.exports = router;
