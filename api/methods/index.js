@@ -1,8 +1,29 @@
 const { Configuration, PlaidApi, PlaidEnvironments, Products, CountryCode } = require("plaid");
 const moment = require("moment");
-
 const client = createPlaidClient();
 
+// Configures and Creates a Plaid API client using environment variables. 
+// Hard-coded to Plaid Version 2020-09-14. 
+function createPlaidClient() {
+  try {
+    const configuration = new Configuration({
+      basePath: PlaidEnvironments["development"],
+      baseOptions: {
+        headers: {
+          'PLAID-CLIENT-ID': process.env.PLAID_CLIENT_ID,
+          'PLAID-SECRET': process.env.PLAID_SECRET, 
+          'Plaid-Version': '2020-09-14',
+        }
+      }
+    });
+    const client = new PlaidApi(configuration);
+    return client;
+  } catch(error) {
+    return error;
+  }
+}
+
+// creates a Plaid link token using a user-specific access token. This runs when we need a token to authenticate the frontend Plaid Link.
 export const createLinkToken = async (req, res, next) => {
   const { headers } = req;
   const { userid: userId } = headers;
@@ -23,18 +44,16 @@ export const createLinkToken = async (req, res, next) => {
     }
 
     try {
-      console.log(request);
       const createTokenResponse = await client.linkTokenCreate(request);
       res.status(200).send(createTokenResponse.data);
     } catch (error) {
-      console.log(error);
       res.status(500).send({ error });
     }
   }
 }
 
+// exchanges a public token for a item-specific access_token. This runs after the Plaid Link successfully connects an account.
 export const exchangeForPublicToken = async (req, res, next) => {
-  console.log(req.body);
   const { body } = req;
   const { public_token } = body;
   if (!public_token) {
@@ -51,12 +70,12 @@ export const exchangeForPublicToken = async (req, res, next) => {
       res.status(200).send({ item_id, access_token });
 
     } catch(error) {
-      console.log(error);
       res.status(500).send({ error });
     }
   }
 }
 
+// gets accounts manually from Plaid using an item-specific access token.
 export const getAccounts = async (req, res, next) => {
   try {
     const { body } = req;
@@ -68,18 +87,16 @@ export const getAccounts = async (req, res, next) => {
     res.status(200).send(accountsResponse.data);
     
   } catch (error) {
-    console.log(error);
     res.status(500).send({ error });
   }
 }
 
-
+// Retrieves a max of 250 transactions within a 30 days from call time, using an item-specific access token.
 export const getTransactions = async (req, res, next) => {
   try {
     const { body } = req;
     const { access_token } = body;
     const { start_date, end_date } = getThirtyDayTimeBracket();
-    console.log(start_date, end_date, access_token);
     const transactionsResponse = await client.transactionsGet({
       access_token,
       start_date,
@@ -92,31 +109,11 @@ export const getTransactions = async (req, res, next) => {
     });
     res.status(200).send(transactionsResponse.data);
   } catch (error) {
-    console.log(error);
     res.status(500).send({ error });
   }
 }
 
-function createPlaidClient() {
-  try {
-    const configuration = new Configuration({
-      basePath: PlaidEnvironments["development"],
-      baseOptions: {
-        headers: {
-          'PLAID-CLIENT-ID': process.env.PLAID_CLIENT_ID,
-          'PLAID-SECRET': process.env.PLAID_SECRET, 
-          'Plaid-Version': '2020-09-14',
-        }
-      }
-    });
-    const client = new PlaidApi(configuration);
-    return client;
-  } catch(error) {
-    console.log(error);
-    return error;
-  }
-}
-
+// Helper function: Gets YYYY-MM-DD formatted date brackets for the last 30 days.
 function getThirtyDayTimeBracket() {
   const now = moment();
   const today = now.format("YYYY-MM-DD");
