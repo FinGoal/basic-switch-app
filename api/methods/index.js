@@ -1,29 +1,5 @@
 import axios from "axios";
-
-const { Configuration, PlaidApi, PlaidEnvironments, Products, CountryCode } = require("plaid");
-const moment = require("moment");
-const client = createPlaidClient();
-
-// Configures and Creates a Plaid API client using environment variables. 
-// Hard-coded to Plaid Version 2020-09-14. 
-function createPlaidClient() {
-  try {
-    const configuration = new Configuration({
-      basePath: PlaidEnvironments["development"],
-      baseOptions: {
-        headers: {
-          'PLAID-CLIENT-ID': process.env.PLAID_CLIENT_ID,
-          'PLAID-SECRET': process.env.PLAID_SECRET, 
-          'Plaid-Version': '2020-09-14',
-        }
-      }
-    });
-    const client = new PlaidApi(configuration);
-    return client;
-  } catch(error) {
-    return error;
-  }
-}
+import moment from "moment";
 
 export const getUserToken = async (req, res, next) => {
 
@@ -49,45 +25,6 @@ export const getUserToken = async (req, res, next) => {
     } catch(error) {
       res.status(500).send({ error });
     } 
-  }
-}
-
-// exchanges a public token for a item-specific access_token. This runs after the Plaid Link successfully connects an account.
-export const exchangeForPublicToken = async (req, res, next) => {
-  const { body } = req;
-  const { public_token } = body;
-  if (!public_token) {
-    res.status(400).send({ error: "`public_token` field missing." });
-  } else {
-
-    try {
-      const response = await client.itemPublicTokenExchange({
-        public_token,
-      });
-
-      const { data } = response;
-      const { item_id, access_token } = data; 
-      res.status(200).send({ item_id, access_token });
-
-    } catch(error) {
-      res.status(500).send({ error });
-    }
-  }
-}
-
-// gets accounts manually from Plaid using an item-specific access token.
-export const getAccounts = async (req, res, next) => {
-  try {
-    const { body } = req;
-    const { access_token } = body; 
-    const accountsResponse = await client.accountsGet({
-      access_token
-    });
-
-    res.status(200).send(accountsResponse.data);
-    
-  } catch (error) {
-    res.status(500).send({ error });
   }
 }
 

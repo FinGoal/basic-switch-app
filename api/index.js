@@ -1,7 +1,8 @@
-require('dotenv').config();
+import dotenv from 'dotenv';
 import routes from './routes'; // Endpoints
-const express = require('express'); // API 
-const morgan = require('morgan'); // Logging
+import express from "express"; // API 
+import morgan from "morgan"; // Logging
+dotenv.config();
 
 const app = express();
 
