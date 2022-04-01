@@ -1,4 +1,4 @@
-import express from 'express'
+import express from 'express';
 import {
   createLinkToken,
   getAccounts,
@@ -6,7 +6,9 @@ import {
   getTransactions,
 } from '../methods';
 
-const router = express.Router()
+// Declaration of API endpoints.
+
+const router = express.Router();
 
 router.post('/create-link-token', createLinkToken);
 router.post('/exchange-public-token', exchangeForPublicToken);

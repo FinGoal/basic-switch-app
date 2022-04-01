@@ -15,6 +15,7 @@ export default {
     }
   },
   async mounted() {
+    console.log(this.$config);
     const token = await this.generateToken();
     this.handler = this.createPlaidInstance(token);
   },

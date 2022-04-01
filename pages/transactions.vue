@@ -50,7 +50,6 @@ export default {
   },
   methods: {
     async getItem() {
-      console.log(this.$store.state.plaidMeta);
       const { public_token } = this.$store.state.plaidMeta;
       if (!public_token) {
         this.error = "No valid Plaid meta detected. Sorry!"
@@ -66,6 +65,7 @@ export default {
         }
       }
     },
+    // Example of how one could retrieve accounts from the PlaidApi client, rather than pulling them directly from the callback data.
     async getAccounts() {
       try {
         const accountsResponse = await axios.post("/api/accounts", { access_token: this.accessToken });
@@ -76,6 +76,7 @@ export default {
         console.error(error);
       }
     },
+    // Transactions, unlike accounts, must be manually retrieved from the PlaidApi client. They do not appear in the Plaid callback data, because they are not always immediately available after account linking.
     async getTransactions() {
       try {
         const transactionsResponse = await axios.post("/api/transactions", { access_token: this.accessToken });

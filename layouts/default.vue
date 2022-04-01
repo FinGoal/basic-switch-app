@@ -5,7 +5,7 @@
 <script>
 export default {
   beforeMount() {
-    console.log("It begins");
+    // Manages the state - commit user and Plaid Metadata from session storage, if they exist in the browser's application storage.
     this.$store.commit("setUserFromStorage");
     this.$store.commit("setPlaidMetaFromStorage");
   }

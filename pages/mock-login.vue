@@ -5,7 +5,7 @@
         <v-col cols="12">
           <v-card>
             <v-card-title>
-              SIGN IN *fake*
+              Mock Login
             </v-card-title>
             <v-card-text>
               <v-text-field
@@ -33,6 +33,7 @@ export default {
     }
   },
   methods: {
+    // commits a username to the store, and redirects to the root page. 
     submitLogin() {
       this.$store.commit("setUser", { username: this.username });
       this.$router.push("/");
