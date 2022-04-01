@@ -61,15 +61,18 @@ export default {
     goToSummary() {
       this.$router.push("/transactions");
     },
+    // parse the accounts redirect data from the Link Money Gateway. Expect multiple items with accounts on each.
     parseAccountsRedirectData() { 
       const events = this.$route.query.events;
-      const eventsJson = JSON.parse(events);
+      const eventsJson = JSON.parse(decodeURIComponent(events));
 
       eventsJson.forEach((event) => {
         const { item_id, accounts } = event;
         this.items.push(item_id);
         this.accounts.push(...accounts);
       });
+
+      this.$store.commit("setItemArray", this.items);
     }
   }
 }

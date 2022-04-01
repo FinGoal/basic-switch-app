@@ -3,7 +3,7 @@
 
 export const state = () => ({
   user: null,
-  plaidMeta: null
+  itemArray: null
 });
 
 export const mutations = {
@@ -21,11 +21,19 @@ export const mutations = {
   },
 
   // sets the Plaid metadata, and sets it in local storage. 
-  setPlaidMeta(state, data) {
-    state.plaidMeta = data;
+  // setPlaidMeta(state, data) {
+  //   state.plaidMeta = data;
+  //   if (window) {
+  //     localStorage.setItem("fin-plaid-meta", JSON.stringify(data));
+  //   } else {
+  //     console.log("NO window")
+  //   }
+  // },
+
+  setItemArray(state, data) {
+    state.itemArray = data;
     if (window) {
-      console.log(window.localStorage);
-      localStorage.setItem("fin-plaid-meta", JSON.stringify(data));
+      localStorage.setItem("fin-item-array", JSON.stringify(data));
     } else {
       console.log("NO window")
     }
@@ -44,11 +52,23 @@ export const mutations = {
   },
 
   // Checks local storage for a plaidMeta variable, and sets the user to that. 
-  setPlaidMetaFromStorage(state) {
+  // setPlaidMetaFromStorage(state) {
+  //   if (window) {
+  //     const meta = window.localStorage.getItem("fin-plaid-meta");
+  //     if (meta) {
+  //       state.plaidMeta = JSON.parse(meta);
+  //     }
+  //   } else {
+  //     throw new Error("Window not found.");
+  //   }
+  // }
+
+  // Checks local storage for a itemArray variable, and sets the user to that. 
+  setItemArrayFromStorage(state) {
     if (window) {
-      const meta = window.localStorage.getItem("fin-plaid-meta");
-      if (meta) {
-        state.plaidMeta = JSON.parse(meta);
+      const itemArray = window.localStorage.getItem("fin-item-array");
+      if (itemArray) {
+        state.itemArray = JSON.parse(itemArray);
       }
     } else {
       throw new Error("Window not found.");
