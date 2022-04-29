@@ -109,17 +109,6 @@ export default {
         console.error(error);
       }
     },
-    async generateToken(itemId) {
-      try {
-        const request = await axios.post("/api/link-money-token", { itemId: itemId });
-        const { data } = request; 
-        const { access_token } = data;
-        return access_token;
-      } catch(error) {
-        console.log(error);
-        return null;
-      }
-    },
   }
 }
 </script>
