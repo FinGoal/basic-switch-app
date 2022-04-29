@@ -1,64 +1,125 @@
 <template>
-  <v-card v-if="plaidMeta">
-    <v-card-title>Plaid Link</v-card-title>
-    <v-divider></v-divider>
-    <v-card-text>
-      <v-simple-table>
-        <template v-slot:default>
-          <thead>
-            <tr>
-              <th class="text-left">ID</th>
-              <th class="text-left">Mask</th>
-              <th class="text-left">Name</th>
-              <th class="text-left">Subtype</th>
-              <th class="text-left">Type</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="account in plaidMeta.accounts" :key="account.id">
-              <td>{{ account.id }}</td>
-              <td>{{ account.mask }}</td>
-              <td>{{ account.name }}</td>
-              <td>{{ account.subtype }}</td>
-              <td>{{ account.type }}</td>
-            </tr>
-          </tbody>
-        </template> 
-      </v-simple-table>
-      <v-simple-table>
-        <template v-slot:default>
-        </template> 
-      </v-simple-table>
-    </v-card-text>
-    <v-card-actions>
-      <v-btn @click="goToSummary">See Transactions</v-btn>
-    </v-card-actions>
-  </v-card>
+  <div>
+    <v-card v-if="plaidMeta">
+      <v-card-title>Plaid Link</v-card-title>
+      <v-divider></v-divider>
+      <v-card-text>
+        <v-simple-table>
+          <template v-slot:default>
+            <thead>
+              <tr>
+                <th class="text-left">ID</th>
+                <th class="text-left">Mask</th>
+                <th class="text-left">Name</th>
+                <th class="text-left">Subtype</th>
+                <th class="text-left">Type</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="account in accounts" :key="account.id">
+                <td>{{ account.id }}</td>
+                <td>{{ account.mask }}</td>
+                <td>{{ account.name }}</td>
+                <td>{{ account.subtype }}</td>
+                <td>{{ account.type }}</td>
+              </tr>
+            </tbody>
+          </template> 
+        </v-simple-table>
+      </v-card-text>
+    </v-card>
+    <v-card v-if="transactions">
+      <v-card-title>Transactions</v-card-title>
+      <v-divider></v-divider>
+      <v-card-text>
+        <v-simple-table>
+          <template v-slot:default>
+            <thead>
+              <tr>
+                <th class="text-left">Amount</th>
+                <th class="text-left">Name</th>
+                <th class="text-left">Date</th>
+                <th class="text-left">Category</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="transaction in transactions" :key="transaction.id">
+                <td>${{ transaction.amount }}</td>
+                <td>{{ transaction.name }}</td>
+                <td>{{ transaction.date }}</td>
+                <td>{{ transaction.category.join(", ") }}</td>
+              </tr>
+            </tbody>
+          </template>
+        </v-simple-table>
+      </v-card-text>
+    </v-card>
+  </div>
 </template>
 
 <script>
+import moment from "moment";
+import axios from "axios";
+
 export default {
   data() {
     return {
       user: null, 
+      itemId: null,
+      accessToken: null,
       plaidMeta: null,
+      items: [],
+      accounts: [],
+      transactions: [],
     }
   },
-  mounted() {
+  async mounted() {
     // only mount this page if the store contains both a user, and Plaid metadata.
     if (this.$store.state.user && this.$store.state.plaidMeta) {
       this.user = this.$store.state.user;
       this.plaidMeta = this.$store.state.plaidMeta;
-    } else {
-      // if the user or Plaid meta doesn't exist, push us back to the mock login.
-      this.$router.push('/mock-login')
+      this.accounts.push(...this.plaidMeta.accounts);
+
+      await this.getItem();
+      await this.getTransactions();
     }
   },
   methods: {
-    // on pushing the next button, redirect to the transaction feed page.
-    goToSummary() {
-      this.$router.push("/transactions");
-    }
+    async getItem() {
+      const { public_token } = this.$store.state.plaidMeta;
+      if (!public_token) {
+      } else {
+        try {
+          const exchangeResponse = await axios.post("/api/exchange-public-token", { public_token });
+          const { data } = exchangeResponse;
+          const { item_id, access_token } = data;
+          this.itemId = item_id;
+          this.accessToken = access_token;
+        } catch(error) {
+          console.log(error);
+        }
+      }
+    },
+    async getTransactions() {
+      try {
+        const transactionsResponse = await axios.post("/api/transactions", { access_token: this.accessToken });
+        const { data } = transactionsResponse;
+        this.transactions = data.transactions;        
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    async generateToken(itemId) {
+      try {
+        const request = await axios.post("/api/link-money-token", { itemId: itemId });
+        const { data } = request; 
+        const { access_token } = data;
+        return access_token;
+      } catch(error) {
+        console.log(error);
+        return null;
+      }
+    },
   }
 }
 </script>
