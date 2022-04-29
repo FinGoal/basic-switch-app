@@ -1,5 +1,7 @@
 const { Configuration, PlaidApi, PlaidEnvironments, Products, CountryCode } = require("plaid");
 const moment = require("moment");
+const axios = require("axios");
+
 const client = createPlaidClient();
 
 // Configures and Creates a Plaid API client using environment variables. 
@@ -120,4 +122,7 @@ function getThirtyDayTimeBracket() {
   const thirtyDaysAgo = now.subtract(30, 'days').format("YYYY-MM-DD");
 
   return { start_date: thirtyDaysAgo, end_date: today };
+}
+
+export const createLinkMoneyToken = async (req, res, next) => {
 }
