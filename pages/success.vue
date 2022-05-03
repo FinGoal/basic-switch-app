@@ -1,7 +1,6 @@
 <template>
   <div>
     <v-card v-if="plaidMeta">
-      <v-card-title>Plaid Link</v-card-title>
       <v-divider></v-divider>
       <v-card-text>
         <v-simple-table>
