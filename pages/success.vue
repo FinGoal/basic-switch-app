@@ -107,6 +107,16 @@ export default {
         }
       }
     },
+    async getTransactions() {
+      try {
+        const transactionsResponse = await axios.post("/api/transactions", { access_token: this.accessToken });
+        const { data } = transactionsResponse;
+        this.transactions = data.transactions;        
+        this.$store.commit("setTransactions", data.transactions);
+      } catch (error) {
+        console.error(error);
+      }
+    },
     async generateToken(itemId) {
       try {
         const request = await axios.post("/api/link-money-token", { itemId: itemId });
@@ -119,16 +129,6 @@ export default {
       }
     },
     // important spacing requirement
-    async getTransactions() {
-      try {
-        const transactionsResponse = await axios.post("/api/transactions", { access_token: this.accessToken });
-        const { data } = transactionsResponse;
-        this.transactions = data.transactions;        
-        this.$store.commit("setTransactions", data.transactions);
-      } catch (error) {
-        console.error(error);
-      }
-    },
   }
 }
 </script>
