@@ -3,7 +3,9 @@
 
 export const state = () => ({
   user: null,
-  plaidMeta: null
+  plaidMeta: null,
+  transactions: null,
+  accounts: null,
 });
 
 export const mutations = {
@@ -13,10 +15,7 @@ export const mutations = {
     state.user = user;
 
     if (window) {
-      console.log(window.localStorage);
       localStorage.setItem("fin-switch-user", JSON.stringify(user));
-    } else {
-      console.log("NO window")
     }
   },
 
@@ -24,11 +23,40 @@ export const mutations = {
   setPlaidMeta(state, data) {
     state.plaidMeta = data;
     if (window) {
-      console.log(window.localStorage);
       localStorage.setItem("fin-plaid-meta", JSON.stringify(data));
-    } else {
-      console.log("NO window")
+    } 
+  },
+
+  setTransactions(state, data) {
+    state.transactions = data;
+    if (window) {
+      localStorage.setItem("fin-plaid-transactions", JSON.stringify(data))
     }
+  },
+
+  setAccounts(state, data) {
+    state.accounts = data;
+    if (window) {
+      localStorage.setItem("fin-plaid-accounts", JSON.stringify(data));
+    }
+  },
+
+  setTransactionsFromStorage(state) {
+    if (window) {
+      const transactions = window.localStorage.getItem("fin-plaid-transactions");
+      if (transactions) {
+        state.transactions = JSON.parse(transactions);
+      }
+    }
+  },
+
+  setAccountsFromStorage(state) {
+    if (window) {
+      const accounts = window.localStorage.getItem("fin-plaid-accounts");
+      if (accounts) {
+        state.accounts = JSON.parse(accounts);
+      }
+    } 
   },
 
   // Checks local storage for a user variable, and sets user to that. 

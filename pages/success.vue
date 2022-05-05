@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-card v-if="plaidMeta">
+    <v-card>
       <v-divider></v-divider>
       <v-card-text>
         <v-simple-table>
@@ -73,15 +73,23 @@ export default {
     }
   },
   async mounted() {
+
+    this.$store.commit("setTransactionsFromStorage");
+    this.$store.commit("setAccountsFromStorage");
+
     // only mount this page if the store contains both a user, and Plaid metadata.
-    if (this.$store.state.user && this.$store.state.plaidMeta) {
+    if (this.$store.state.transactions && this.$store.state.transactions.length > 0 && this.$store.state.accounts && this.$store.state.accounts.length > 0) {
+      this.accounts.push(...this.$store.state.accounts);
+      this.transactions.push(...this.$store.state.transactions);
+    } else if (this.$store.state.user && this.$store.state.plaidMeta) {
       this.user = this.$store.state.user;
       this.plaidMeta = this.$store.state.plaidMeta;
       this.accounts.push(...this.plaidMeta.accounts);
+      this.$store.commit("setAccounts", this.accounts);
 
       await this.getItem();
       await this.getTransactions();
-    }
+    } 
   },
   methods: {
     async getItem() {
@@ -104,10 +112,23 @@ export default {
         const transactionsResponse = await axios.post("/api/transactions", { access_token: this.accessToken });
         const { data } = transactionsResponse;
         this.transactions = data.transactions;        
+        this.$store.commit("setTransactions", data.transactions);
       } catch (error) {
         console.error(error);
       }
     },
+    async generateToken(itemId) {
+      try {
+        const request = await axios.post("/api/link-money-token", { itemId: itemId });
+        const { data } = request; 
+        const { access_token } = data;
+        return access_token;
+      } catch(error) {
+        console.log(error);
+        return null;
+      }
+    },
+    // important spacing requirement
   }
 }
 </script>
