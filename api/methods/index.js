@@ -124,5 +124,41 @@ function getThirtyDayTimeBracket() {
   return { start_date: thirtyDaysAgo, end_date: today };
 }
 
+
 export const createLinkMoneyToken = async (req, res, next) => {
+  try {
+    const { body } = req;
+    const { userId, itemId } = body;
+    const data = {
+      client_id: process.env.LINK_MONEY_CLIENT_ID,
+      client_secret: process.env.LINK_MONEY_CLIENT_SECRET,
+      audience: 'https://link-money-api/',
+      grant_type: 'client_credentials',
+      organization: 'switchkit',
+    };
+		// use a userId string if you require a user token.
+    if (userId) {
+      data.userId = userId;
+    
+		// use an item_id string if you require an item token. 
+    } else if (itemId) {
+      data.item_id = itemId; 
+    }
+    
+    const config = {
+      method: 'post',
+      url: 'https://dev-jhhgu9vc.auth0.com/oauth/token',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      data: data,
+    }
+
+    const createTokenResponse = await axios(config);
+    const { data: tokenData } = createTokenResponse;
+		const { access_token } = tokenData;
+    res.status(200).send({ access_token });
+  } catch (error) {
+    // any http errors will be surfaced here. 
+  }
 }

@@ -53,7 +53,6 @@ export default {
         onEvent(eventName, metadata) {
         }
       });
-
       return handler;
     },
     openLink() {
