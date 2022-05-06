@@ -1,6 +1,7 @@
 <template>
   <div>
     <v-card>
+      <v-card-title>Accounts</v-card-title>
       <v-divider></v-divider>
       <v-card-text>
         <v-simple-table>
@@ -116,19 +117,7 @@ export default {
       } catch (error) {
         console.error(error);
       }
-    },
-    async generateToken(itemId) {
-      try {
-        const request = await axios.post("/api/link-money-token", { itemId: itemId });
-        const { data } = request; 
-        const { access_token } = data;
-        return access_token;
-      } catch(error) {
-        console.log(error);
-        return null;
-      }
-    },
-    // important spacing requirement
+    }
   }
 }
 </script>
