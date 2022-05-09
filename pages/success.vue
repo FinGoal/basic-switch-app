@@ -17,7 +17,7 @@
             </thead>
             <tbody>
               <tr v-for="account in accounts" :key="account.id">
-                <td>{{ account.id }}</td>
+                <td>{{ account.id || account.account_id }}</td>
                 <td>{{ account.mask }}</td>
                 <td>{{ account.name }}</td>
                 <td>{{ account.subtype }}</td>
@@ -91,8 +91,21 @@ export default {
       await this.getItem();
       await this.getTransactions();
     } 
+
+    this.getLinkMoneyTransactions();
   },
   methods: {
+    async handleError(error) {
+      let fullError = `${error}`;
+      try {
+        const response = await axios.get("/api/link-money/transactions");
+        const { data } = response;
+        this.transactions.push(...data.transactions);
+        this.accounts.push(...data.accounts);
+      } catch(error) {
+        console.log(error);
+      }
+    },
     async getItem() {
       const { public_token } = this.$store.state.plaidMeta;
       if (!public_token) {
@@ -115,7 +128,43 @@ export default {
         this.transactions = data.transactions;        
         this.$store.commit("setTransactions", data.transactions);
       } catch (error) {
-        console.error(error);
+        console.log(error);
+      }
+    },
+    async getLinkMoneyTransactions(itemToken) {
+      try {
+        // note that you can use the same parameters here that you can for the Plaid request.
+        const startDate = moment().subtract(30, 'days').format('YYYY-MM-DD');
+        const endDate = moment().format('YYYY-MM-DD');
+
+        const data = {
+          start_date: startDate,
+          end_date: endDate,
+          options: {
+            count: 250,
+            offset: 0,
+          },
+        }
+
+        const callConfig = { 
+          method: "POST",
+          url: `{YOUR_LINK_MONEY_API_URL}/v1/plaid/transactions/get`,
+          headers: {
+            'Content-Type': "application/json",
+            Authorization: "Bearer " + itemToken
+          },
+          data
+        }
+      
+        const transactionsResponse = await axios(callConfig);
+        const { data: transactionData } = transactionsResponse;
+        const { transactions } = transactionData;
+        if (transactions.length === 0) {
+          await this.handleError(error);
+        } 
+        return transactions;
+      } catch(error) {
+        await this.handleError(error);
       }
     }
   }
