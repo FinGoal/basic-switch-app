@@ -46,7 +46,7 @@
               <tr v-for="transaction in transactions" :key="transaction.id">
                 <td>${{ transaction.amount }}</td>
                 <td>{{ transaction.name }}</td>
-                <td>{{ transaction.date }}</td>
+                <td>{{ transaction.date.split("T")[0] }}</td>
                 <td>{{ transaction.category.join(", ") }}</td>
               </tr>
             </tbody>
