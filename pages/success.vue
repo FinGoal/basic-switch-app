@@ -131,42 +131,6 @@ export default {
         console.log(error);
       }
     },
-    async getLinkMoneyTransactions(itemToken) {
-      try {
-        // note that you can use the same parameters here that you can for the Plaid request.
-        const startDate = moment().subtract(30, 'days').format('YYYY-MM-DD');
-        const endDate = moment().format('YYYY-MM-DD');
-
-        const data = {
-          start_date: startDate,
-          end_date: endDate,
-          options: {
-            count: 250,
-            offset: 0,
-          },
-        }
-
-        const callConfig = { 
-          method: "POST",
-          url: `{YOUR_LINK_MONEY_API_URL}/v1/plaid/transactions/get`,
-          headers: {
-            'Content-Type': "application/json",
-            Authorization: "Bearer " + itemToken
-          },
-          data
-        }
-      
-        const transactionsResponse = await axios(callConfig);
-        const { data: transactionData } = transactionsResponse;
-        const { transactions } = transactionData;
-        if (transactions.length === 0) {
-          await this.handleError(error);
-        } 
-        return transactions;
-      } catch(error) {
-        await this.handleError(error);
-      }
-    }
   }
 }
 </script>
