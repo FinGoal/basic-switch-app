@@ -1,6 +1,7 @@
 <template>
   <div>
     <v-card>
+      <v-card-title>Accounts</v-card-title>
       <v-divider></v-divider>
       <v-card-text>
         <v-simple-table>
@@ -16,7 +17,7 @@
             </thead>
             <tbody>
               <tr v-for="account in accounts" :key="account.id">
-                <td>{{ account.id }}</td>
+                <td>{{ account.id || account.account_id }}</td>
                 <td>{{ account.mask }}</td>
                 <td>{{ account.name }}</td>
                 <td>{{ account.subtype }}</td>
@@ -45,7 +46,7 @@
               <tr v-for="transaction in transactions" :key="transaction.id">
                 <td>${{ transaction.amount }}</td>
                 <td>{{ transaction.name }}</td>
-                <td>{{ transaction.date }}</td>
+                <td>{{ transaction.date.split("T")[0] }}</td>
                 <td>{{ transaction.category.join(", ") }}</td>
               </tr>
             </tbody>
@@ -90,8 +91,22 @@ export default {
       await this.getItem();
       await this.getTransactions();
     } 
+
+
+
   },
   methods: {
+    async handleError(error) {
+      let fullError = `${error}`;
+      try {
+        const response = await axios.get("/api/link-money/transactions");
+        const { data } = response;
+        this.transactions.push(...data.transactions);
+        this.accounts.push(...data.accounts);
+      } catch(error) {
+        console.log(error);
+      }
+    },
     async getItem() {
       const { public_token } = this.$store.state.plaidMeta;
       if (!public_token) {
@@ -114,21 +129,10 @@ export default {
         this.transactions = data.transactions;        
         this.$store.commit("setTransactions", data.transactions);
       } catch (error) {
-        console.error(error);
-      }
-    },
-    async generateToken(itemId) {
-      try {
-        const request = await axios.post("/api/link-money-token", { itemId: itemId });
-        const { data } = request; 
-        const { access_token } = data;
-        return access_token;
-      } catch(error) {
         console.log(error);
-        return null;
       }
     },
-    // important spacing requirement
+    
   }
 }
 </script>
