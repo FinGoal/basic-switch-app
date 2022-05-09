@@ -92,7 +92,8 @@ export default {
       await this.getTransactions();
     } 
 
-    this.getLinkMoneyTransactions();
+
+
   },
   methods: {
     async handleError(error) {
@@ -131,7 +132,7 @@ export default {
         console.log(error);
       }
     },
-    
+
   }
 }
 </script>
