@@ -6,7 +6,13 @@
           <v-card>
             <v-card-title> Mock Login </v-card-title>
             <v-card-text>
-              <v-text-field label="Username" v-model="username"></v-text-field>
+              <v-text-field
+                label="Organization"
+                v-model="organization"
+              ></v-text-field>
+            </v-card-text>
+            <v-card-text>
+              <v-text-field label="User Id" v-model="userId"></v-text-field>
             </v-card-text>
             <v-card-actions>
               <v-btn @click="submitLogin"> Sign In </v-btn>
@@ -27,13 +33,15 @@ export default {
   },
   data() {
     return {
-      username: null,
+      organization: null,
+      userId: null,
     };
   },
   methods: {
     submitLogin() {
-      const { username } = this;
-      this.$store.commit("setUser", { username });
+      const { organization, userId } = this;
+      this.$store.commit("setOrganization", organization);
+      this.$store.commit("setUser", { userId });
       this.$router.push("/micro-deposits");
     },
   },

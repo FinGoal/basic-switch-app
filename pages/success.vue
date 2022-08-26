@@ -23,11 +23,10 @@
               <td>{{ account.type }}</td>
             </tr>
           </tbody>
-        </template> 
+        </template>
       </v-simple-table>
       <v-simple-table>
-        <template v-slot:default>
-        </template> 
+        <template v-slot:default> </template>
       </v-simple-table>
     </v-card-text>
     <v-card-actions>
@@ -40,10 +39,10 @@
 export default {
   data() {
     return {
-      user: null, 
+      user: null,
       accounts: [],
       items: [],
-    }
+    };
   },
   mounted() {
     // only mount this page if the store contains a user
@@ -53,7 +52,7 @@ export default {
       this.parseAccountsRedirectData();
     } else {
       // if the user or Plaid meta doesn't exist, push us back to the mock login.
-      this.$router.push('/mock-login')
+      this.$router.push("/mock-login");
     }
   },
   methods: {
@@ -62,7 +61,7 @@ export default {
       this.$router.push("/transactions");
     },
     // parse the accounts redirect data from the Link Money Gateway. Expect multiple items with accounts on each.
-    parseAccountsRedirectData() { 
+    parseAccountsRedirectData() {
       const events = this.$route.query.events;
       const eventsJson = JSON.parse(decodeURIComponent(events));
 
@@ -73,7 +72,7 @@ export default {
       });
 
       this.$store.commit("setItemArray", this.items);
-    }
-  }
-}
+    },
+  },
+};
 </script>

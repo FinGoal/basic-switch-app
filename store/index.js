@@ -2,13 +2,23 @@
 // without having to run the Link Account process manually again.
 
 export const state = () => ({
-  user: null,
-  itemArray: null
+  organization: "",
+  user: "",
+  itemArray: null,
 });
 
 export const mutations = {
-
   // sets the user state, and sets the item in local storage.
+  setOrganization(state, organization) {
+    state.organization = organization;
+
+    if (window) {
+      console.log(window.localStorage);
+      localStorage.setItem("fin-switch-organization", organization);
+    } else {
+      console.log("NO window");
+    }
+  },
   setUser(state, user) {
     state.user = user;
 
@@ -16,11 +26,11 @@ export const mutations = {
       console.log(window.localStorage);
       localStorage.setItem("fin-switch-user", JSON.stringify(user));
     } else {
-      console.log("NO window")
+      console.log("NO window");
     }
   },
 
-  // sets the Plaid metadata, and sets it in local storage. 
+  // sets the Plaid metadata, and sets it in local storage.
   // setPlaidMeta(state, data) {
   //   state.plaidMeta = data;
   //   if (window) {
@@ -35,11 +45,11 @@ export const mutations = {
     if (window) {
       localStorage.setItem("fin-item-array", JSON.stringify(data));
     } else {
-      console.log("NO window")
+      console.log("NO window");
     }
   },
 
-  // Checks local storage for a user variable, and sets user to that. 
+  // Checks local storage for a user variable, and sets user to that.
   setUserFromStorage(state) {
     if (window) {
       const user = window.localStorage.getItem("fin-switch-user");
@@ -51,7 +61,7 @@ export const mutations = {
     }
   },
 
-  // Checks local storage for a plaidMeta variable, and sets the user to that. 
+  // Checks local storage for a plaidMeta variable, and sets the user to that.
   // setPlaidMetaFromStorage(state) {
   //   if (window) {
   //     const meta = window.localStorage.getItem("fin-plaid-meta");
@@ -63,7 +73,7 @@ export const mutations = {
   //   }
   // }
 
-  // Checks local storage for a itemArray variable, and sets the user to that. 
+  // Checks local storage for a itemArray variable, and sets the user to that.
   setItemArrayFromStorage(state) {
     if (window) {
       const itemArray = window.localStorage.getItem("fin-item-array");
@@ -73,5 +83,5 @@ export const mutations = {
     } else {
       throw new Error("Window not found.");
     }
-  }
-}
+  },
+};
