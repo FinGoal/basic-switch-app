@@ -102,7 +102,7 @@ export default {
         const response = await axios.get("/api/link-money/transactions");
         const { data } = response;
         this.transactions.push(...data.transactions);
-        this.accounts.push(...data.accounts);
+        // this.accounts.push(...data.accounts);
       } catch(error) {
         console.log(error);
       }
